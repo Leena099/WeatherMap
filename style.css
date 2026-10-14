@@ -1,0 +1,68 @@
+body {
+    font-family: 'Roboto', sans-serif;
+    font-size: 1rem;
+    margin: 0;
+    padding: 1rem;
+    background-color: #f4f6f8;
+}
+
+h1 {
+    font-size: 2rem;
+    text-align: center;
+    padding: 0.75rem;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+form {
+    display: flex;
+    gap: 0.5rem;
+    max-width: 600px;
+    margin: 1.5rem auto;
+}
+
+label {
+    align-self: center;
+    font-weight: 700;
+}
+
+input[type="text"] {
+    flex: 1;
+    appearance: none;
+    padding: 0.7rem 1rem;
+    font-size: 1rem;
+    border: 2px solid #9aa5b1;
+    border-radius: 8px;
+    outline: none;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+input[type="text"]:focus {
+    border-color: #1f3a5f;
+    box-shadow: 0 0 0 3px rgba(31, 58, 95, 0.2);
+}
+
+button {
+    appearance: none;
+    padding: 0.7rem 1.2rem;
+    font-size: 1rem;
+    color: #ffffff;
+    background-color: #1f3a5f;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+button:hover {
+    background-color: #2d5086;
+    transform: translateY(-1px);
+}
+
+#map {
+    height: 70vh;
+    border: 3px solid #000080;
+    border-radius: 12px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+}
