@@ -10,8 +10,8 @@ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
 }).addTo(map);
 
 // Convert the place name into coordinates using Nominatim (OpenStreetMap)
-async function getCoordinates(placeName) {
-    const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(placeName)}&format=json&limit=1`;
+async function getCoordinates(locationName) {
+    const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(locationName)}&format=json&limit=1`;
     const response = await fetch(url);
 
     if (!response.ok) {
@@ -34,11 +34,12 @@ async function getCoordinates(placeName) {
 // When the submit the form the page will be stopped from reloadling
 search.addEventListener('submit', async (event) => {
     event.preventDefault();
-    const placeName = locationInput.value.trim();
+    const locationName = locationInput.value.trim();
 
     try {
-        const coord = await getCoordinates(placeName);
+        const coord = await getCoordinates(locationName);
         const weather = await getWeather(coord.lat, coord.lng);
+        showOnMap(coord, weather, locationName);
         console.log(weather);
     } catch (error) {
         console.error(error.message);
@@ -57,3 +58,42 @@ async function getWeather(lat, lng) {
 
     return await response.json();
 }
+
+let currentMarker = null; 
+
+// Fly the map to the location and put a marker there
+function showOnMap(coord, weather, locationName) {
+    map.flyTo([coord.lat, coord.lng], 10); // flyTo moves the map with a smooth zoom animation instead of jumping. Zoom 10 is about city level
+
+    if (currentMarker) {
+        map.removeLayer(currentMarker);
+    }
+    currentMarker = L.marker([coord.lat, coord.lng]).addTo(map);
+    currentMarker.bindPopup(displayCard(weather, locationName));
+
+    // Wait until the map stops moving, then open the popup
+    map.once('moveend', () => currentMarker.openPopup());
+}
+
+// Build a card to show weather 
+function displayCard(weather, locationName) {
+
+    const card = document.createElement('div');
+    card.className = 'weatherCard';
+    card.innerHTML = `
+        <h3>${weather.name || locationName}</h3>
+        <img src="https://openweathermap.org/img/wn/${weather.weather[0].icon}@2x.png" alt="${weather.weather[0].description}">
+        <p class="temp">${Math.round(weather.main.temp)}°C</p>
+        <p>${weather.weather[0].description}</p>
+        <p>Clouds: ${weather.clouds.all}%</p>
+        <p>Humidity: ${weather.main.humidity}%</p>
+        <p>Wind: ${weather.wind.speed} m/s</p>
+        <button type="button" class="shareBtn">Share</button>`;
+
+    card.querySelector('.shareBtn').addEventListener('click', () => {
+    console.log('Share clicked');
+    });
+
+    return card;
+}
+
