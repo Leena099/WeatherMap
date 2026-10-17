@@ -66,3 +66,40 @@ button:hover {
     border-radius: 12px;
     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
 }
+
+.weatherCard {
+    background-color: #dee8f6;
+    text-align: center;
+    min-width: 150px;
+}
+
+.weatherCard h3 {
+    margin-top: 1rem;
+}
+
+.weatherCard img {
+    width: 80px;
+    height: 80px;
+}
+
+.weatherCard .temp {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.weatherCard p {
+    margin: 0.2rem 0;
+    text-align: flex;
+
+}
+
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+   background-color: #dee8f6;
+}
+
+
+.leaflet-popup-content {
+   margin: 0;
+}
