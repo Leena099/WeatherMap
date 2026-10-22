@@ -3,6 +3,25 @@ const map = L.map('map').setView([15.5007, 32.5599], 6);
 const search = document.getElementById('search-form');
 const locationInput = document.getElementById('locationInput');
 
+const loading = document.getElementById('loading');
+const errorMessage = document.getElementById('errorMessage');
+
+// Show or hide the spinner
+function showLoading(isLoading) {
+    loading.hidden = !isLoading;
+}
+
+// Show a friendly error card
+function showError(message) {
+    errorMessage.textContent = message;
+    errorMessage.hidden = false;
+}
+
+// Hide the error card
+function clearError() {
+    errorMessage.hidden = true;
+}
+
 // Add the map from OpenStreetMap
 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
@@ -31,10 +50,36 @@ async function getCoordinates(locationName) {
     };
 }
 
+// Get the current weather for the location by coordinates
+async function getWeather(lat, lng) {
+    const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lng}&appid=${APIKey}&units=metric`;
+    const response = await fetch(url);
+
+    if (!response.ok) {
+        if(response.status === 404) {
+            throw new Error(`No weather data was found for that location`);
+        }
+        if(response.status === 429) {
+            throw new Error(`Too many requests. Please wait a minute and try again.`);
+        }
+        throw new Error(`Weather request failed (${response.status})`);
+    }
+
+    return await response.json();
+}
+
 // When the submit the form the page will be stopped from reloadling
 search.addEventListener('submit', async (event) => {
     event.preventDefault();
     const locationName = locationInput.value.trim();
+
+    clearError();
+
+    if(!locationName) {
+        showError(`Please enter a location name`);
+        return;
+    }
+    showLoading(true);
 
     try {
         const coord = await getCoordinates(locationName);
@@ -43,21 +88,17 @@ search.addEventListener('submit', async (event) => {
         console.log(weather);
     } catch (error) {
         console.error(error.message);
+
+        const message = error instanceof TypeError ?
+        `Network problem! Check your internet connection and try again`:error.message;
+
+        showError(message);
+    } finally {
+        showLoading(false);
     }
     
 });
 
-// Get the current weather for the location by coordinates
-async function getWeather(lat, lng) {
-    const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lng}&appid=${APIKey}&units=metric`;
-    const response = await fetch(url);
-
-    if (!response.ok) {
-        throw new Error(`Weather request failed (${response.status})`);
-    }
-
-    return await response.json();
-}
 
 let currentMarker = null; 
 
