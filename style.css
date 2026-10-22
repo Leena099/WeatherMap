@@ -132,3 +132,22 @@ button:hover {
     border: 2px solid #ff5f00;
     border-radius: 8px;
 }
+
+/* Phone */
+@media (max-width: 600px) {
+    body {
+        padding: 0.5rem;
+    }
+
+    form {
+        flex-direction: column;
+    }
+
+    label {
+        align-self: flex-start;
+    }
+
+    button {
+        width: 100%;
+    }
+}
