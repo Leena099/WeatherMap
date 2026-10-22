@@ -87,7 +87,7 @@ search.addEventListener('submit', async (event) => {
         showOnMap(coord, weather, locationName);
         console.log(weather);
     } catch (error) {
-        console.error(error.message);
+        console.error(error);
 
         const message = error instanceof TypeError ?
         `Network problem! Check your internet connection and try again`:error.message;
