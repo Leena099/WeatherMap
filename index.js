@@ -34,13 +34,13 @@ async function getCoordinates(locationName) {
     const response = await fetch(url);
 
     if (!response.ok) {
-        throw new Error('Geocoding request failed');
+        throw new Error('The location service is not responding. Please try again later.');
     }
 
     const results = await response.json();
 
     if (results.length === 0) {
-        throw new Error('Place not found');
+        throw new Error('Could not find that place. Check the spelling and try again');
     }
 
     return {
@@ -85,7 +85,6 @@ search.addEventListener('submit', async (event) => {
         const coord = await getCoordinates(locationName);
         const weather = await getWeather(coord.lat, coord.lng);
         showOnMap(coord, weather, locationName);
-        console.log(weather);
     } catch (error) {
         console.error(error);
 

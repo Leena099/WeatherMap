@@ -127,7 +127,7 @@ button:hover {
     max-width: 500px;
     margin: 1rem auto;
     padding: 0.8rem 1rem;
-    color: #FF6600;
+    color: #9a3b00;
     background-color: #fdeaea;
     border: 2px solid #ff5f00;
     border-radius: 8px;
@@ -147,7 +147,7 @@ button:hover {
         align-self: flex-start;
     }
 
-    button {
+    form button {
         width: 100%;
     }
 }
