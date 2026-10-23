@@ -69,16 +69,9 @@ async function getWeather(lat, lng) {
 }
 
 // When the submit the form the page will be stopped from reloadling
-search.addEventListener('submit', async (event) => {
-    event.preventDefault();
-    const locationName = locationInput.value.trim();
 
+async function searchPlace(locationName) {
     clearError();
-
-    if(!locationName) {
-        showError(`Please enter a location name`);
-        return;
-    }
     showLoading(true);
 
     try {
@@ -95,7 +88,16 @@ search.addEventListener('submit', async (event) => {
     } finally {
         showLoading(false);
     }
-    
+}
+    search.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const locationName = locationInput.value.trim();
+
+    if(!locationName) {
+        showError(`Please enter a location name`);
+        return;
+    }
+    searchPlace(locationName);
 });
 
 
@@ -115,25 +117,116 @@ function showOnMap(coord, weather, locationName) {
     map.once('moveend', () => currentMarker.openPopup());
 }
 
+function shareText(weather, cityName) {
+    return `Weather in ${cityName}: ${Math.round(weather.main.temp)}°C, ${weather.weather[0].description}. Humidity ${weather.main.humidity}%, Wind ${weather.wind.speed} m/s.`;
+}
 // Build a card to show weather 
 function displayCard(weather, locationName) {
-
+    
+    const cityName = weather.name || locationName;
     const card = document.createElement('div');
     card.className = 'weatherCard';
     card.innerHTML = `
-        <h3>${weather.name || locationName}</h3>
+        <h3> </h3>
         <img src="https://openweathermap.org/img/wn/${weather.weather[0].icon}@2x.png" alt="${weather.weather[0].description}">
         <p class="temp">${Math.round(weather.main.temp)}°C</p>
         <p>${weather.weather[0].description}</p>
         <p>Clouds: ${weather.clouds.all}%</p>
         <p>Humidity: ${weather.main.humidity}%</p>
         <p>Wind: ${weather.wind.speed} m/s</p>
-        <button type="button" class="shareBtn">Share</button>`;
+        <div class="cardAction">
+            <button type="button" class="shareBtn">Share</button>
+            <button type="button" class="favoriteBtn">Save</button>
+        </div>`;
+        
+    card.querySelector('h3').textContent = cityName; // Title
 
-    card.querySelector('.shareBtn').addEventListener('click', () => {
-    console.log('Share clicked');
+    // Share button
+    card.querySelector('.shareBtn').addEventListener('click', async (event) => {
+        const button = event.currentTarget;
+        const text = shareText(weather, cityName);
+
+        try {
+            if (navigator.share) {
+                await navigator.share({title: 'Weather Map', text: text});
+            }else {
+                await navigator.clipboard.writeText(text);
+                button.textContent = 'Copied';
+                setTimeout(() => {button.textContent = 'Share';}, 2000);
+            }
+        
+        } catch (error) {
+            console.error(error);
+        }
+    });
+
+    // Save button
+    card.querySelector('.favoriteBtn').addEventListener('click', (event) => {
+        addFavorite(cityName);
+        event.currentTarget.textContent = 'Saved';
     });
 
     return card;
 }
 
+// favorite button (save)
+const favoriteplaces = document.getElementById('favorites');
+
+function getFavorite() {
+    try{
+        return JSON.parse(localStorage.getItem('favorites')) || [];
+    } catch (error) {
+        return [];
+    }
+}
+
+// Write the list to the browser
+function saveFavorite(list) {
+    localStorage.setItem('favorites', JSON.stringify(list));
+}
+
+// Add a place and refresh the buttons
+function addFavorite(name) {
+    const favorite = getFavorite();
+
+    if (!favorite.includes(name)) {
+        favorite.push(name);
+        saveFavorite(favorite);
+        renderFavorites();
+    }
+}
+
+function removeFavorite(name) {
+    saveFavorite(getFavorite().filter((item) => item !== name));
+    renderFavorites();
+}
+
+function renderFavorites() {
+    favoriteplaces.innerHTML = '';
+
+    getFavorite().forEach((name) => {
+        const chip = document.createElement('span');
+        chip.className = 'favorite';
+
+        const goButton = document.createElement('button');
+        goButton.type = 'button';
+        goButton.textContent = name; // textContent keeps typed text safe
+        goButton.addEventListener('click', () => {
+            locationInput.value = name;
+            searchPlace(name);
+        });
+
+        const removeButton = document.createElement('button');
+        removeButton.type = 'button';
+        removeButton.className = 'favorite-remove';
+        removeButton.textContent = '×';
+        removeButton.setAttribute('aria-label', `Remove ${name}`);
+        removeButton.addEventListener('click', () => removeFavorite(name));
+
+        chip.append(goButton, removeButton);
+        favoriteplaces.appendChild(chip);
+    });
+}
+
+// Show saved places when the page opens
+renderFavorites();

@@ -91,6 +91,41 @@ button:hover {
     margin: 0.2rem 0;
 }
 
+.weatherCard .cardAction {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.favorites {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+    max-width: 600px;
+    margin: 0 auto 1rem;
+}
+
+.favorite {
+    display: inline-flex;
+}
+
+.favorite button {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.9rem;
+    border-radius: 0;
+}
+
+.favorite button:first-child {
+    border-radius: 8px 0 0 8px;
+}
+
+.favorite-remove {
+    background-color: #9aa5b1;
+    border-radius: 0 8px 8px 0;
+}
+
 .leaflet-popup-content-wrapper,
 .leaflet-popup-tip {
    background-color: #dee8f6;
